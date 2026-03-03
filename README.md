@@ -28,8 +28,8 @@ The script automates reCAPTCHA solving using:
 
 1. **Clone the repository:**
    ```bash
-   git clone <repository-url>
-   cd dbc_api_selenium_python3
+   git clone https://github.com/deathbycaptcha/deathbycaptcha-python-selenium
+   cd deathbycaptcha-python-selenium
    ```
 
 2. **Create a virtual environment (recommended):**
@@ -164,7 +164,7 @@ For issues with:
 
 ## 📄 License
 
-This project is an educational example. Use it at your own risk.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ## 🤝 Contributions
 
