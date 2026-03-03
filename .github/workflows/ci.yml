@@ -1,0 +1,108 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "*"
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Test (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
+
+    env:
+      MOZ_HEADLESS: "1"
+      DBC_USERNAME: ${{ secrets.DBC_USERNAME }}
+      DBC_PASSWORD: ${{ secrets.DBC_PASSWORD }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install Firefox
+        uses: browser-actions/setup-firefox@v1
+
+      - name: Install GeckoDriver
+        uses: browser-actions/setup-geckodriver@latest
+
+      - name: Show browser versions
+        run: |
+          firefox --version
+          geckodriver --version
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Validate syntax and imports
+        run: |
+          python --version
+          python -m py_compile python_selenium_example.py
+          python -c "import selenium; import deathbycaptcha; from dotenv import load_dotenv; print('All imports successful')"
+
+      - name: Run Selenium script (if secrets are configured)
+        shell: bash
+        run: |
+          if [[ -n "$DBC_USERNAME" && -n "$DBC_PASSWORD" ]]; then
+            {
+              echo "DBC_USERNAME=$DBC_USERNAME"
+              echo "DBC_PASSWORD=$DBC_PASSWORD"
+            } > .env
+
+            timeout 120 python python_selenium_example.py || echo "Script finished with exit code $?"
+          else
+            echo "Skipping execution: DBC_USERNAME/DBC_PASSWORD secrets are not set"
+          fi
+
+      - name: Upload debug artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-artifacts-py${{ matrix.python-version }}
+          path: |
+            *.png
+            *.log
+          if-no-files-found: ignore
+
+  validate:
+    name: Validate (pylint)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pylint
+          pip install -r requirements.txt
+
+      - name: Run pylint (non-blocking)
+        run: |
+          pylint python_selenium_example.py --exit-zero || true
