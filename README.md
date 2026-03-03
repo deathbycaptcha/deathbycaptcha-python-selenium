@@ -1,5 +1,7 @@
 # Selenium reCAPTCHA Solver with DeathByCaptcha
 
+[![CI](https://github.com/deathbycaptcha/deathbycaptcha-python-selenium/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/deathbycaptcha/deathbycaptcha-python-selenium/actions/workflows/ci.yml)
+
 This project is an automation example using Selenium and Python that utilizes the DeathByCaptcha API service to solve Google reCAPTCHA v2 challenges.
 
 ## 📋 Description
@@ -110,7 +112,7 @@ This project includes `.github/workflows/ci.yml` for automated testing with GitH
 
 ### Workflow Features
 
-- **Multi-version Testing**: Runs on Python 3.14 and 3.15
+- **Python 3.14 Testing**: Tests run on Python 3.14
 - **Headless Firefox**: Uses Firefox + GeckoDriver in headless mode
 - **Validation Steps**: Syntax and imports checks before script execution
 - **Optional Full Run**: Executes the Selenium script only when secrets are available

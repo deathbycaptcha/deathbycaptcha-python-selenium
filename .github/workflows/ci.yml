@@ -19,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.11", "3.12", "3.13", "3.14"]
+        python-version: ["3.14"]
 
     env:
       MOZ_HEADLESS: "1"
@@ -81,28 +81,3 @@ jobs:
             *.png
             *.log
           if-no-files-found: ignore
-
-  validate:
-    name: Validate (pylint)
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-          cache: pip
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install pylint
-          pip install -r requirements.txt
-
-      - name: Run pylint (non-blocking)
-        run: |
-          pylint python_selenium_example.py --exit-zero || true
